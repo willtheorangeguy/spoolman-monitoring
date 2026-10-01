@@ -1,0 +1,5 @@
+# Add these entries under scrape_configs in prometheus.yml. Replace example hosts and token paths.
+- job_name: spoolman
+  metrics_path: /metrics
+  static_configs:
+    - targets: [spoolman.example:7912]

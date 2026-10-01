@@ -1,0 +1,761 @@
+{
+  "uid": "spoolman-filament",
+  "title": "Spoolman Filament Inventory",
+  "description": "Current inventory and its history from Spoolman's native Prometheus metrics. Weight used is per currently tracked spool, not an all-time consumption counter. Prices are omitted because no currency is exported with the metric.",
+  "tags": [
+    "3d-printing",
+    "spoolman",
+    "filament"
+  ],
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "refresh": "30s",
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "prometheus_ds",
+        "label": "Prometheus data source",
+        "type": "datasource",
+        "query": "prometheus",
+        "hide": 0,
+        "refresh": 1,
+        "multi": false,
+        "includeAll": false
+      },
+      {
+        "name": "job_spoolman",
+        "label": "Prometheus job: spoolman",
+        "type": "textbox",
+        "query": "spoolman",
+        "hide": 0,
+        "refresh": 0,
+        "multi": false,
+        "includeAll": false,
+        "current": {
+          "text": "spoolman",
+          "value": "spoolman"
+        }
+      },
+      {
+        "name": "instance",
+        "label": "Instance",
+        "type": "query",
+        "query": {
+          "query": "label_values(up{job=\"${job_spoolman}\"}, instance)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "hide": 0,
+        "refresh": 1,
+        "multi": false,
+        "includeAll": false,
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${prometheus_ds}"
+        }
+      }
+    ]
+  },
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Tracked Spools",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"})",
+          "instant": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Not reported"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Filament Variants",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(spoolman_filament_info{job=\"${job_spoolman}\",instance=\"$instance\"})",
+          "instant": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Not reported"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Vendors",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(count by(vendor) (spoolman_filament_info{job=\"${job_spoolman}\",instance=\"$instance\"}))",
+          "instant": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Not reported"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Remaining Filament",
+      "description": "Net remaining weight across currently tracked spools.",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum((spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"} - on(spool_id,filament_id) spoolman_spool_weight_used{job=\"${job_spoolman}\",instance=\"$instance\"})) / 1000",
+          "instant": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:kg",
+          "noValue": "Not reported"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Used on Tracked Spools",
+      "description": "Current used-weight readings; this is not lifetime filament consumption.",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(spoolman_spool_weight_used{job=\"${job_spoolman}\",instance=\"$instance\"}) / 1000",
+          "instant": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:kg",
+          "noValue": "Not reported"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Spools Below 20%",
+      "description": "Remaining percentage relative to each spool's initial net weight.",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(((spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"} - on(spool_id,filament_id) spoolman_spool_weight_used{job=\"${job_spoolman}\",instance=\"$instance\"}) / on(spool_id,filament_id) spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"}) < 0.2) or on() (0 * count(spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"}))",
+          "instant": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Not reported",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Inventory Weight History",
+      "description": "Snapshot of currently tracked spools; totals can change when spools are added or removed.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum((spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"} - on(spool_id,filament_id) spoolman_spool_weight_used{job=\"${job_spoolman}\",instance=\"$instance\"})) / 1000",
+          "legendFormat": "Remaining",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum(spoolman_spool_weight_used{job=\"${job_spoolman}\",instance=\"$instance\"}) / 1000",
+          "legendFormat": "Used",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:kg",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 12,
+            "showPoints": "never",
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": "bargauge",
+      "title": "Remaining by Spool",
+      "description": "Exact remaining net weight for each spool.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "((spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"} - on(spool_id,filament_id) spoolman_spool_weight_used{job=\"${job_spoolman}\",instance=\"$instance\"}) * on(filament_id) group_left(name,material,vendor,color) spoolman_filament_info{job=\"${job_spoolman}\",instance=\"$instance\"})",
+          "legendFormat": "{{vendor}} {{name}} · #{{spool_id}}",
+          "instant": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:g",
+          "min": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 200
+              },
+              {
+                "color": "green",
+                "value": 500
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "basic",
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": "table",
+      "title": "Current Spool Inventory — Remaining Weight",
+      "description": "One row per spool with its actual vendor, filament, material, color, IDs and remaining grams.",
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 12
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "((spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"} - on(spool_id,filament_id) spoolman_spool_weight_used{job=\"${job_spoolman}\",instance=\"$instance\"}) * on(filament_id) group_left(name,material,vendor,color) spoolman_filament_info{job=\"${job_spoolman}\",instance=\"$instance\"})",
+          "instant": true,
+          "format": "table",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Remaining (g)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "suffix:g"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Color"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "string"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Filament ID"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "string"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Spool ID"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "string"
+              }
+            ]
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "host_group": true,
+              "hostname": true,
+              "instance": true,
+              "job": true,
+              "role": true
+            },
+            "renameByName": {
+              "Value": "Remaining (g)",
+              "spool_id": "Spool ID",
+              "filament_id": "Filament ID",
+              "name": "Filament",
+              "vendor": "Vendor",
+              "material": "Material",
+              "color": "Color"
+            }
+          }
+        }
+      ],
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      }
+    },
+    {
+      "id": 10,
+      "type": "bargauge",
+      "title": "Remaining Percentage by Spool",
+      "description": "Relative to each spool's initial net weight.",
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "100 * (spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"} - on(spool_id,filament_id) spoolman_spool_weight_used{job=\"${job_spoolman}\",instance=\"$instance\"}) / on(spool_id,filament_id) spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"}",
+          "legendFormat": "Spool #{{spool_id}}",
+          "instant": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 20
+              },
+              {
+                "color": "green",
+                "value": 50
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 11,
+      "type": "bargauge",
+      "title": "Spools by Material",
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count by(material) (spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"} * on(filament_id) group_left(material) spoolman_filament_info{job=\"${job_spoolman}\",instance=\"$instance\"})",
+          "legendFormat": "{{material}}",
+          "instant": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Remaining Weight by Material",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 34
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(material) ((spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"} - on(spool_id,filament_id) spoolman_spool_weight_used{job=\"${job_spoolman}\",instance=\"$instance\"}) * on(filament_id) group_left(material) spoolman_filament_info{job=\"${job_spoolman}\",instance=\"$instance\"}) / 1000",
+          "legendFormat": "{{material}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:kg",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 12,
+            "showPoints": "never",
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "type": "bargauge",
+      "title": "Spools by Vendor",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 34
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_ds}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count by(vendor) (spoolman_spool_initial_weight{job=\"${job_spoolman}\",instance=\"$instance\"} * on(filament_id) group_left(vendor) spoolman_filament_info{job=\"${job_spoolman}\",instance=\"$instance\"})",
+          "legendFormat": "{{vendor}}",
+          "instant": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_ds}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    }
+  ]
+}
