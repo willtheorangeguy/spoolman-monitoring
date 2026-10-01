@@ -1,12 +1,37 @@
-# spoolman-monitoring — Architecture
+# Architecture
 
-Spoolman native /metrics -> Prometheus -> Grafana inventory dashboard.
+This project connects its data source to its Grafana dashboard through the components shown below.
+
+## Overview
+
+This diagram shows the data path for this project.
+
+```mermaid
+graph LR
+  A[Spoolman /metrics] -->|scraped by| B[Prometheus]
+  B -->|queried by| C[Grafana dashboard]
+```
 
 ## Components
 
-- [dashboards/](../dashboards): Grafana dashboard definitions
-- [examples/](../examples): deployment and scrape examples
+### Data source
 
-## Data interpretation
+Spoolman /metrics -> Prometheus -> Grafana inventory dashboard.
 
-Remaining weight is initial net weight minus current used weight; it is not lifetime consumption. Snapshot totals change when spools enter or leave inventory. Material and vendor series come from filament metadata joined by filament_id.
+### Dashboard
+
+`dashboards/spoolman-filament.json` contains the Grafana dashboard definition.
+
+## Data flow
+
+Spoolman /metrics -> Prometheus -> Grafana inventory dashboard. Grafana evaluates dashboard queries against the selected data source and label values.
+
+## Directory layout
+
+```text
+.
+├── dashboards/  Grafana dashboard JSON files
+├── examples/  Scrape and deployment examples
+├── docs/        Documentation source
+└── README.md    Project overview and quick links
+```

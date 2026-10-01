@@ -1,17 +1,17 @@
-# spoolman-monitoring — Dashboard Usage
+# Dashboard usage
 
-Import the JSON files using **Grafana → Dashboards → New → Import**. Set the data source and variables listed in [configuration](./configuration.md).
+Import the JSON files using **Grafana → Dashboards → New → Import**. Set the data source and variables listed in [configuration](configuration.md).
 
 ## Spoolman Filament Inventory
 
-Source: [spoolman-filament.json](../dashboards/spoolman-filament.json). Refresh: `30s`.
+Source: [`dashboards/spoolman-filament.json`](https://github.com/willtheorangeguy/spoolman-monitoring/blob/HEAD/dashboards/spoolman-filament.json). Refresh: `30s`.
 
 <!-- Screenshot: after adding spoolman-filament.png to .github/icons/spoolman-monitoring/, replace this comment with ![Spoolman Filament Inventory](https://raw.githubusercontent.com/willtheorangeguy/.github/main/icons/spoolman-monitoring/spoolman-filament.png). -->
 
 ### Panels
 
 | Panel | Type | What it shows |
-|---|---|---|
+| --- | --- | --- |
 | Tracked Spools | stat | See the query reference below. |
 | Filament Variants | stat | See the query reference below. |
 | Vendors | stat | See the query reference below. |
