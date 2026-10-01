@@ -1,31 +1,55 @@
-# Spoolman filament inventory dashboard
+<h1 align="center">spoolman-monitoring</h1>
+<h4 align="center">A Grafana dashboard for Spoolman spool weights, remaining filament, materials and vendors using native Prometheus metrics.</h4>
 
-Portable monitoring bundle with example configuration. Replace example addresses and token paths for your installation; no live credentials are included.
+<div align="center">
+  <img alt="GitHub Issues" src="https://img.shields.io/github/issues/willtheorangeguy/spoolman-monitoring">
+  <img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/willtheorangeguy/spoolman-monitoring">
+  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue">
+  <img alt="gitleaks workflow" src="https://github.com/willtheorangeguy/spoolman-monitoring/actions/workflows/gitleaks.yml/badge.svg">
+  <img alt="testing workflow" src="https://github.com/willtheorangeguy/spoolman-monitoring/actions/workflows/testing.yml/badge.svg">
+</div>
 
-## Requirements
+<p align="center">
+  <a href="#key-features">Key Features</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#usage">Usage</a> •
+  <a href="#documentation">Documentation</a> •
+  <a href="#support">Support</a> •
+  <a href="#contributing">Contributing</a> •
+  <a href="#license">License</a>
+</p>
 
-Spoolman's native Prometheus metrics endpoint and a Prometheus scrape job.
+<!-- Screenshot: after adding spoolman-monitoring/overview.png to .github/icons/, replace this comment with ![Dashboard overview](https://raw.githubusercontent.com/willtheorangeguy/.github/main/icons/spoolman-monitoring/overview.png). -->
 
-## Dashboards
+A Grafana dashboard for Spoolman spool weights, remaining filament, materials and vendors using native Prometheus metrics.
 
-- `dashboards/spoolman-filament.json`
+## Key Features
 
-Import the JSON in Grafana using **Dashboards > New > Import**. Select your data source from the dashboard variable(s) at the top. Update the Prometheus job variables to match your `scrape_configs` job names; use the Instance selector when present. The dashboard's JSON is also suitable for file provisioning after you have selected or provisioned data source UIDs.
+- Remaining filament weight by spool and material.
+- Inventory grouped by vendor and material.
+- Low remaining percentage view.
+- Native Spoolman metrics with no separate exporter.
 
-Expected default job labels:
+## Installation
 
-- `spoolman-filament.json`: spoolman
+Spoolman native /metrics endpoint, Prometheus and Grafana. Enable the Spoolman metrics endpoint, adapt examples/prometheus-scrape.yml and import dashboards/spoolman-filament.json. Select the spoolman job and instance. See [installation](docs/installation.md) for more detail.
 
-## Monitoring code
+## Usage
 
-See the code and example configuration in this folder, if present. Keep API keys and metrics bearer tokens in local secret files or another secret manager; never commit them. Scrape examples use documentation addresses and must be edited for your network.
+Import [spoolman-filament.json](dashboards/spoolman-filament.json) in Grafana using **Dashboards → New → Import**. Choose the data source and match the dashboard variables to your monitoring labels. See [dashboard usage](docs/usage.md).
 
-## Before publishing
+## Documentation
 
-Test against the application and Grafana versions you intend to support. Add a license you choose and check attribution for upstream components. No release or Grafana catalog upload has been performed.
+Full documentation lives in [docs/](docs/README.md): [Quickstart](docs/quickstart.md) · [Configuration](docs/configuration.md) · [Architecture](docs/architecture.md) · [Dashboard usage](docs/usage.md) · [Troubleshooting](docs/troubleshooting.md).
 
-## Spoolman setup
+## Support
 
-Enable Spoolman's native Prometheus endpoint, let Prometheus scrape it as job `spoolman`, and select the job and instance in Grafana. Keep `/metrics` on your private monitoring network; it includes inventory labels. Add your own Spoolman UI link after import if desired.
+Open a [GitHub Discussion](https://github.com/willtheorangeguy/spoolman-monitoring/discussions/new) or file an [issue](https://github.com/willtheorangeguy/spoolman-monitoring/issues/new/choose).
 
-A sample `scrape_configs` fragment is in `examples/prometheus-scrape.yml`; replace the example hosts and token paths.
+## Contributing
+
+Contributions welcome. See the org-wide [Contributing Guide](https://github.com/willtheorangeguy/.github/blob/main/CONTRIBUTING.md) and [Code of Conduct](https://github.com/willtheorangeguy/.github/blob/main/CODE_OF_CONDUCT.md).
+
+## License
+
+MIT — see [LICENSE.md](LICENSE.md).
